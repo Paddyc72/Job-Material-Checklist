@@ -1,0 +1,239 @@
+<title>Job Supplies Checklist</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: single phone column. Fill screen → required-count bar → summary card sized to one screenshot. */
+:root{
+  --bg:#F4F7F9; --surface:#FFFFFF; --fg:#16232B; --muted:#5E6A70; --line:#D9E1E6;
+  --blue:#0082BA; --navy:#236192; --grey:#707372; --todo:#FFF6DA; --ok:#2E7D4F;
+  --display:"Montserrat",system-ui,sans-serif; --body:"Inter",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E161B; --surface:#17222A; --fg:#E8EEF2; --muted:#9AA7AE; --line:#2A3943;
+  --blue:#3BAEDF; --navy:#7FB0D9; --grey:#A3A6A5; --todo:#3A3420; --ok:#5FC28A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E161B; --surface:#17222A; --fg:#E8EEF2; --muted:#9AA7AE; --line:#2A3943;
+  --blue:#3BAEDF; --navy:#7FB0D9; --grey:#A3A6A5; --todo:#3A3420; --ok:#5FC28A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 120px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header .brand{font-family:var(--display);font-size:20px;letter-spacing:.01em}
+.brand .c{color:var(--blue);font-weight:600}.brand .n{color:var(--grey);font-weight:700}
+header h1{font-family:var(--display);font-weight:700;font-size:22px;margin:2px 0 4px;text-wrap:balance}
+header p{margin:0;color:var(--muted);font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.field{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.field:last-child{border-bottom:0}
+label.k{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=date],textarea{font:inherit;font-size:17px;color:var(--fg);background:transparent;border:0;padding:4px 0;width:100%;min-width:0}
+textarea{resize:vertical;min-height:70px}
+input:focus,textarea:focus{outline:none}
+.field:focus-within{box-shadow:inset 3px 0 0 var(--blue)}
+h2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin:0 0 6px 2px}
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row.blank{background:var(--todo)}
+.name{font-weight:500;min-width:0}.unit{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:22px;line-height:1;cursor:pointer}
+.step button:active{transform:scale(.96)}
+.step input{width:64px;height:42px;text-align:center;font:inherit;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.step input:focus{outline:2px solid var(--blue);outline-offset:1px}
+.yn{display:flex;gap:6px}
+.yn button{min-width:58px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.yn button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.bar .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.bar .left{flex:1;font-size:14px;color:var(--muted);min-width:0}
+.bar .left b{color:var(--fg)}
+.go{height:48px;padding:0 20px;border-radius:12px;border:0;background:var(--blue);color:#fff;font-family:var(--display);font-weight:700;font-size:15px;cursor:pointer}
+.go:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+.ghost{height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+/* summary */
+#sum{display:flex;flex-direction:column;gap:12px}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
+.tip b{color:var(--blue)}
+.sheet{background:#FFFFFF;color:#111;border-radius:10px;padding:14px 14px 12px;border:1px solid var(--line);font-size:12.5px;line-height:1.25}
+.sheet .hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0082BA;padding-bottom:6px;margin-bottom:8px;gap:8px}
+.sheet .hd .brand{font-size:16px}.sheet .hd .brand .c{color:#0082BA}.sheet .hd .brand .n{color:#707372}
+.sheet .hd .t{font-family:var(--display);font-weight:700;font-size:13px}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-bottom:8px}
+.meta dt{color:#555;font-weight:600}.meta dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.grp{break-inside:avoid;margin-bottom:6px}
+.grp h3{font-family:var(--display);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#236192;margin:0 0 2px}
+.li{display:flex;justify-content:space-between;gap:6px;padding:1.5px 0;border-bottom:1px dotted #ccc}
+.li span:last-child{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.other{margin-top:6px;border-top:1px solid #ddd;padding-top:5px;overflow-wrap:anywhere}
+.sbtns{display:flex;gap:10px;flex-wrap:wrap}
+.wa .wan{grid-column:1/-1;font:inherit;font-size:17px;font-weight:500;color:var(--fg);background:transparent;border:0;border-bottom:1px dashed var(--line);padding:2px 0 6px;width:100%;min-width:0}
+.wa .wan:focus{outline:none;border-bottom-color:var(--blue)}
+.wa .ctl{display:flex;gap:6px;align-items:center}
+.wa .x{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
+.sheet .sec{font-family:var(--display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#236192;margin:8px 0 3px;font-weight:700}
+.sheet .groups{columns:2;column-gap:14px}
+.sheet .tot{font-weight:700;border-bottom:0}
+.sheet .zero{margin-top:6px;color:#444;font-style:italic}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" id="form">
+  <header>
+    <div class="brand"><span class="c">concept</span><span class="n">72</span></div>
+    <h1>Job Supplies Checklist</h1>
+    <p>Fill at the end of every job. Every line needs an answer. Enter 0 if none used.</p>
+    <div class="sbtns" style="margin-top:12px"><button class="ghost" id="clear" type="button">Clear form for a new job</button></div>
+    <div id="confirmClear" class="tip" style="margin-top:10px" hidden>Erase every answer and start a new job? Your name stays filled in.<div class="sbtns" style="margin-top:8px"><button class="go" id="yesClear" type="button">Yes, erase</button><button class="ghost" id="noClear" type="button">Cancel</button></div></div>
+  </header>
+
+  <div class="card">
+    <div class="field"><label class="k" for="customer">Customer</label><input id="customer" type="text" autocomplete="off" placeholder="Last name / job name"></div>
+    <div class="field"><label class="k" for="chief">Crew Chief</label><input id="chief" type="text" autocomplete="off" placeholder="Your name"></div>
+    <div class="field"><label class="k" for="date">Job End Date</label><input id="date" type="date"></div>
+  </div>
+
+  <section>
+    <h2>Work Area Hours</h2>
+    <div class="card" id="wa"></div>
+    <div class="sbtns" style="margin-top:8px"><button class="ghost" id="addwa" type="button">+ Add work area</button></div>
+  </section>
+
+  <div id="groups"></div>
+
+  <section>
+    <h2>Anything else used</h2>
+    <div class="card"><div class="field"><label class="k" for="other">Item and quantity (optional)</label><textarea id="other" placeholder="e.g. 2 extra stakes"></textarea></div></div>
+  </section>
+</div>
+
+<div class="wrap" id="sum" hidden>
+  <div class="tip"><b>Take a screenshot of the sheet below</b> and attach it to the job in LMN (History &amp; Photos).</div>
+  <div class="sheet" id="sheet"></div>
+  <div class="sbtns"><button class="ghost" id="edit" type="button">Edit</button><button class="ghost" id="newjob" type="button">Start a new job</button></div>
+  <div id="confirmNew" class="tip" hidden>Clear everything and start a new job? <div class="sbtns" style="margin-top:8px"><button class="ghost" id="yesNew" type="button">Yes, clear it</button><button class="ghost" id="noNew" type="button">Cancel</button></div></div>
+</div>
+
+<div class="bar" id="bar"><div class="in">
+  <div class="left" id="status"></div>
+  <button class="go" id="done" type="button" disabled>Finish</button>
+</div></div>
+
+<script>
+const GROUPS=[
+ ["Brass Fixtures",[["fb_boll","Bollard Light Brass","qty"],["fb_acc2102","Brass Accent Light 2102","qty"],["fb_bul2101","Bullet Light Up Brass 2101","qty"],["fb_bulmr11","Bullet Light Up/Down MR11 Brass","qty"],["fb_dl2101","Down Light Brass 2101","qty"],["fb_tiki36","Islander Tiki Light 36\"","qty"],["fb_tiki48","Islander Tiki Light 48\"","qty"],["fb_ledge40","Ledge Light 7\" Brass 40L","qty"],["fb_ledge140","Ledge Light 7\" Brass 140L","qty"],["fb_pathclr","Path Light Brass Clear Lens","qty"],["fb_pathfr","Path Light Brass Frosted Lens","qty"],["fb_sconce","Sconce Brass","qty"],["fb_uw","Underwater Light","qty"],["fb_wellbig","Well Light Big Brass","qty"],["fb_wellbigsh","Well Light Big Brass with Shroud","qty"],["fb_wellsm","Well Light Small Brass","qty"]]],
+ ["Black Fixtures",[["fk_bul2101","Bullet Uplight Black 2101","qty"],["fk_bulmr11","Bullet Light Up/Down MR11 Black","qty"],["fk_bulmr8","Bullet Light Up/Down MR8 Black","qty"],["fk_dl2101","Down Light Black 2101","qty"],["fk_ledge40","Ledge Light 7\" Black 40L","qty"],["fk_ledge140","Ledge Light 7\" Black 140L","qty"],["fk_pathclr","Path Light Black Clear Lens","qty"],["fk_pathfr","Path Light Black Frosted Lens","qty"],["fk_post","Post Light Black","qty"],["fk_postsm","Small Post Light Black","qty"],["fk_wellbig","Well Light Black Big","qty"],["fk_wellsm","Well Light Small Black","qty"]]],
+ ["Transformers",[["t75","Transformer 75W","qty"],["t150","Transformer 150W","qty"],["t300","Transformer 300W","qty"],["ply","Plywood backing for transformer","yn"]]],
+ ["Wire",[["w12","12-2 Wire","rolls"],["w16","16-2 Wire","rolls"]]],
+ ["Connectors & Splicing",[["scon","Small Silicone Connectors","qty"],["lcon","Large Silicone Connectors","qty"],["heat","Heat Shrink","qty"],["p31","3-to-1 Plugs","qty"]]],
+ ["Fixture Accessories",[["lens","Frosted Lenses","qty"],["louv","Hex Louvers","qty"]]],
+ ["Mounting & Hardware",[["screw","Screws","qty"],["staple","Staples","qty"],["pl","PL (construction adhesive)","tubes"],["caulk","Silicone Caulking","tubes"],["valve","Valve Boxes","qty"],["outlet","Outlet Cover","qty"]]],
+ ["Brackets & Risers",[["lcbk","L-Shape Connector, Black","qty"],["lcbr","L-Shape Connector, Brass","qty"],["tcbk","T-Shape Connector, Black","qty"],["tcbr","T-Shape Connector, Brass","qty"],["r3bk","3\" Riser, Black","qty"],["r3br","3\" Riser, Brass","qty"],["r7bk","7\" Riser, Black","qty"],["r7br","7\" Riser, Brass","qty"],["r12bk","12\" Riser, Black","qty"],["r12br","12\" Riser, Brass","qty"],["r24bk","24\" Riser, Black","qty"],["r24br","24\" Riser, Brass","qty"],["radj","Adjustable Riser","qty"],["treebk","Tree Bracket, Black","qty"],["treebr","Tree Bracket, Brass","qty"],["sphbk","Sphere Base, Black","qty"],["sphbr","Sphere Base, Brass","qty"],["gutter","Gutter Bracket","qty"]]],
+ ["Marking",[["tape","Color Code Tape","rolls"]]]
+];
+const ITEMS=GROUPS.flatMap(g=>g[1]);
+const KEY="c72-supplies-draft";
+let S={};
+try{S=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){S={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+
+function build(){
+  const box=$("groups");
+  GROUPS.forEach(([g,items])=>{
+    const sec=document.createElement("section");
+    sec.innerHTML=`<h2>${g}</h2><div class="card"></div>`;
+    const card=sec.querySelector(".card");
+    items.forEach(([id,name,unit])=>{
+      const r=document.createElement("div");r.className="row";r.id="r-"+id;
+      const unitLbl=unit==="yn"?"":`<span class="unit">${unit==="ft"?"feet":unit}</span>`;
+      if(unit==="yn"){
+        r.innerHTML=`<div class="name">${name}</div><div class="yn"><button type="button" id="${id}-y" aria-pressed="false">Yes</button><button type="button" id="${id}-n" aria-pressed="false">No</button></div>`;
+        r.querySelector(`#${id}-y`).onclick=()=>{S[id]="Yes";upd()};
+        r.querySelector(`#${id}-n`).onclick=()=>{S[id]="No";upd()};
+      }else{
+        const step=unit==="ft"?10:1;
+        r.innerHTML=`<label class="name" for="${id}">${esc(name)}${unitLbl}</label><div class="step"><button type="button" aria-label="Less ${esc(name)}">−</button><input id="${id}" inputmode="decimal" type="text" placeholder="–"><button type="button" aria-label="More ${esc(name)}">+</button></div>`;
+        const [m,p]=r.querySelectorAll("button"),inp=r.querySelector("input");
+        const cur=()=>parseFloat(S[id])||0;
+        m.onclick=()=>{S[id]=String(Math.max(0,cur()-step));upd()};
+        p.onclick=()=>{S[id]=String(S[id]===undefined||S[id]===""?(step===10?10:1):cur()+step);upd()};
+        inp.oninput=()=>{const v=inp.value.replace(",",".").replace(/[^0-9.]/g,"");S[id]=v;inp.value=v;upd(true)};
+      }
+      card.appendChild(r);
+    });
+    box.appendChild(sec);
+  });
+  ["customer","chief","date","other"].forEach(id=>{$(id).oninput=()=>{S[id]=$(id).value;upd(true)}});
+  if(!S.date){const d=new Date();S.date=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+}
+function waInit(){if(!Array.isArray(S.wa)||!S.wa.length)S.wa=[{n:"",h:""},{n:"",h:""},{n:"",h:""}]}
+function renderWA(){
+  waInit();
+  const box=$("wa");box.innerHTML="";
+  S.wa.forEach((w,i)=>{
+    const r=document.createElement("div");r.className="row wa";r.id="wa-"+i;
+    r.innerHTML=`<input class="wan" id="wan-${i}" type="text" autocomplete="off" placeholder="Work area ${i+1} (e.g. Front facade)" aria-label="Work area ${i+1} name"><span class="unit">Crew hours</span><div class="ctl"><div class="step"><button type="button" aria-label="Less hours">−</button><input id="wah-${i}" inputmode="decimal" type="text" placeholder="–" aria-label="Work area ${i+1} hours"><button type="button" aria-label="More hours">+</button></div>${S.wa.length>1?`<button type="button" class="x" aria-label="Remove work area ${i+1}">×</button>`:""}</div>`;
+    const nm=r.querySelector(".wan"),hi=r.querySelector(`#wah-${i}`),[m,p]=r.querySelectorAll(".step button"),x=r.querySelector(".x");
+    nm.value=w.n||"";hi.value=w.h||"";
+    nm.oninput=()=>{S.wa[i].n=nm.value;upd(true)};
+    hi.oninput=()=>{const v=hi.value.replace(",",".").replace(/[^0-9.]/g,"");S.wa[i].h=v;hi.value=v;upd(true)};
+    const cur=()=>parseFloat(S.wa[i].h)||0, rd=v=>String(Math.round(v*100)/100);
+    m.onclick=()=>{S.wa[i].h=rd(Math.max(0,cur()-0.5));hi.value=S.wa[i].h;upd()};
+    p.onclick=()=>{S.wa[i].h=S.wa[i].h===""||S.wa[i].h===undefined?"1":rd(cur()+0.5);hi.value=S.wa[i].h;upd()};
+    if(x)x.onclick=()=>{S.wa.splice(i,1);renderWA();upd()};
+    box.appendChild(r);
+  });
+}
+$("addwa").onclick=()=>{waInit();S.wa.push({n:"",h:""});renderWA();upd();const n=$("wan-"+(S.wa.length-1));if(n)n.focus()};
+function upd(fromTyping){
+  waInit();
+  let blank=0;
+  S.wa.forEach((w,i)=>{const e=!(w.n||"").trim()||w.h===""||w.h===undefined;if(!(w.n||"").trim())blank++;if(w.h===""||w.h===undefined)blank++;const r=$("wa-"+i);if(r)r.classList.toggle("blank",e)});
+  ITEMS.forEach(([id,,unit])=>{
+    const v=S[id];const empty=v===undefined||v==="";
+    if(empty)blank++;
+    $("r-"+id).classList.toggle("blank",empty);
+    if(unit==="yn"){$(id+"-y").setAttribute("aria-pressed",v==="Yes");$(id+"-n").setAttribute("aria-pressed",v==="No")}
+    else if(!fromTyping||document.activeElement!==$(id)){$(id).value=empty?"":v}
+  });
+  ["customer","chief","date","other"].forEach(id=>{if(document.activeElement!==$(id))$(id).value=S[id]||""});
+  const headMissing=["customer","chief","date"].filter(k=>!(S[k]||"").trim()).length;
+  const left=blank+headMissing;
+  $("status").innerHTML=left?`<b>${left}</b> ${left===1?"line":"lines"} left to answer`:`<b style="color:var(--ok)">All lines answered</b>`;
+  $("done").disabled=left>0;
+  save();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function showSummary(){
+  const fmt=(v,u)=>u==="yn"?v:(u==="qty"?v:`${v} ${u}`);
+  let html=`<div class="hd"><span class="brand"><span class="c">concept</span><span class="n">72</span></span><span class="t">JOB SUPPLIES</span></div>
+  <dl class="meta"><dt>Customer</dt><dd>${esc(S.customer)}</dd><dt>Crew Chief</dt><dd>${esc(S.chief)}</dd><dt>Job End</dt><dd>${esc(S.date)}</dd></dl>`;
+  const tot=S.wa.reduce((a,w)=>a+(parseFloat(w.h)||0),0);
+  html+=`<div class="sec">Work Area Hours</div>`+S.wa.map(w=>`<div class="li"><span>${esc(w.n)}</span><span>${esc(w.h)} h</span></div>`).join("")+`<div class="li tot"><span>Total</span><span>${Math.round(tot*100)/100} h</span></div>`;
+  let zeros=0;
+  html+=`<div class="sec">Materials Used</div><div class="groups">`;
+  GROUPS.forEach(([g,items])=>{
+    const used=items.filter(([id,,u])=>{const keep=u==="yn"||parseFloat(S[id])>0;if(!keep)zeros++;return keep});
+    if(!used.length)return;
+    html+=`<div class="grp"><h3>${g}</h3>`+used.map(([id,n,u])=>`<div class="li"><span>${esc(n.replace(" (construction adhesive)",""))}</span><span>${esc(fmt(S[id],u))}</span></div>`).join("")+"</div>";
+  });
+  html+="</div>";
+  if(zeros)html+=`<div class="zero">All other checklist items: 0</div>`;
+  html+=`<div class="other"><b>Other:</b> ${S.other&&S.other.trim()?esc(S.other):"None"}</div>`;
+  $("sheet").innerHTML=html;
+  $("form").hidden=true;$("bar").hidden=true;$("sum").hidden=false;window.scrollTo(0,0);
+}
+$("done").onclick=showSummary;
+$("edit").onclick=()=>{$("sum").hidden=true;$("form").hidden=false;$("bar").hidden=false;$("confirmNew").hidden=true};
+$("newjob").onclick=()=>{$("confirmNew").hidden=false};
+$("noNew").onclick=()=>{$("confirmNew").hidden=true};
+$("yesNew").onclick=()=>{const chief=S.chief;S={chief};$("confirmNew").hidden=true;build2();$("edit").onclick()};
+function build2(){renderWA();if(!S.date){const d=new Date();S.date=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}upd()}
+$("clear").onclick=()=>{$("confirmClear").hidden=false};
+$("noClear").onclick=()=>{$("confirmClear").hidden=true};
+$("yesClear").onclick=()=>{const chief=S.chief;S={chief};$("confirmClear").hidden=true;build2();window.scrollTo(0,0)};
+build();renderWA();upd();
+</script>
